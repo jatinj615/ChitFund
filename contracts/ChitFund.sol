@@ -3,6 +3,8 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import {LendingPoolInterface} from "./LendingPool.sol";
+import {Token21} from "./Token21.sol";
+import {IERC20} from "./IERC20.sol";
 
 /**
  * @title Storage
@@ -15,6 +17,8 @@ interface DateTimeInterface {
 
 contract ChitFund {
     
+
+    IERC20 dai = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
     // mapping (uint => address) 
     
     // datetime interface 
@@ -42,18 +46,23 @@ contract ChitFund {
         _;
     }
     
-    modifier minDeposit() {
-        require(msg.value >= 1 ether, "Minimum Deposit amount is 1 ETH");
+    modifier minDeposit(uint256 _amount) {
+        require(_amount >= 500 , "Minimum Deposit amount is $500");
         _;
     }
     
+    function _approve(address _spender, uint256 _amount) public returns (bool) {
+        dai.approve(_spender, _amount);
+        return true;
+    }
     
     
-    function _deposit() public payable minDeposit() returns(uint)  {
+    function _deposit(uint256 _amount) public payable minDeposit(_amount) returns(uint) {
         Member storage user = ownerInfo[msg.sender];
-        user.value += msg.value;
-        
-        lendingPool.deposit(assetAddress, msg.value, msg.sender, 0);
+        dai.transferFrom(msg.sender, address(this), _amount);
+        user.value += _amount;
+        dai.approve(lpAddress, _amount);
+        lendingPool.deposit(assetAddress, _amount, msg.sender, 0);
         return address(this).balance;
     }
     
