@@ -1,5 +1,8 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
+const LendingPoolV2Artifact = require('@aave/protocol-v2/artifacts/contracts/protocol/lendingpool/LendingPool.sol/LendingPool.json');
+const IERC20Artifact = require('@openzeppelin/contracts/build/contracts/IERC20.json');
+
 
 describe("Token21", function() {
   it("Token functionalities", async function() {
@@ -29,40 +32,32 @@ describe("ChitFund", function() {
   it("ChitFund functionalities", async function() {
     const ChitFund = await ethers.getContractFactory("ChitFund");
     const chitFund = await ChitFund.deploy();
+    // console.log(lendingPoolAbi);
+    const ierc20Abi = IERC20Artifact.abi;
 
-    const abi = [
-      // View functions 
-      "function totalSupply() external view returns (uint256)", 
-      "function balanceOf(address account) external view returns (uint256)",
-      "function allowance(address owner, address spender) external view returns (uint256)",
-      // Authenticated functions
-      "function transfer(address recipient, uint256 amount) external returns (bool)",
-      "function approve(address spender, uint256 amount) external returns (bool)",
-      "function transferFrom(address sender, address recipient, uint256 amount) external returns (bool)",
-      // events
-      "event Transfer(address indexed from, address indexed to, uint256 value)",
-      "event Approval(address indexed owner, address indexed spender, uint256 value)"
-    ]
+    // console.log(IERC20Artifact);
+    const impersonateAccount = "0x9e033f4d440c4e387ed87759cb4436c7a95c45a3"
     const daiAddress = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
-    const provider = await ethers.getDefaultProvider();
-
-    const dai = await new ethers.Contract(daiAddress, abi, provider);
+    const provider = ethers.getDefaultProvider();
+    const amount = ethers.utils.parseEther("500");
+    // console.log(amount.toString());
     await chitFund.deployed();
     
     await hre.network.provider.request({
       method: "hardhat_impersonateAccount",
       params: ["0x9e033f4d440c4e387ed87759cb4436c7a95c45a3"]}
-    )
-
-    signer = ethers.provider.getSigner("0x9e033f4d440c4e387ed87759cb4436c7a95c45a3");
+      )
     
+    signer = ethers.provider.getSigner(impersonateAccount);
+    const dai = new ethers.Contract(daiAddress, ierc20Abi, signer);
     const [owner, addr1, addr2] = await ethers.getSigners();
-    console.log(await dai.balanceOf(addr1.address));
-    // await dai.connect(addr1.address).approve(chitFund.address, 500);
-    // create dai object and approve for address
-    // await chitFund.connect(addr1.address)._approve(chitFund.address, 50);
-    // dai account =  0x47ac0fb4f2d84898e4d9e7b4dab3c24507a6d503
-    // await chitFund.dai.approve(chitFund)
-    // await chitFund.connect(addr1)._deposit(500);
+    
+    const balanceBefore = await dai.balanceOf(impersonateAccount);
+    console.log(balanceBefore.toString());
+    await dai.connect(signer).approve(chitFund.address, amount);
+    // // // create dai object and approve for address
+    await chitFund.connect(signer)._deposit(amount);
+    const balanceAfter = await dai.balanceOf(impersonateAccount);
+    console.log(balanceAfter.toString());
   });
 });
