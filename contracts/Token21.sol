@@ -57,7 +57,7 @@ contract Token21 {
         uint256 currentAllowance = allowed[_sender][_receiver];
         require(currentAllowance >= _amount, "Not allowed");
         _transfer(_sender, _receiver, _amount);
-        _approve(_sender, _receiver, _amount);
+        _approve(_sender, _receiver, currentAllowance - _amount);
         return true;
     }
 
