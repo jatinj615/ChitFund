@@ -4,30 +4,6 @@ const LendingPoolV2Artifact = require('@aave/protocol-v2/artifacts/contracts/pro
 const IERC20Artifact = require('@openzeppelin/contracts/build/contracts/IERC20.json');
 
 
-// describe("Token21", function() {
-//   it("Token functionalities", async function() {
-//     const Token21 = await ethers.getContractFactory("Token21");
-//     const token21 = await Token21.deploy(100000);
-    
-//     await token21.deployed();
-
-//     // 
-//     const [owner, addr1, addr2] = await ethers.getSigners();
-//     // console.log(owner, addr1);
-//     // console.log(await token21.totalSupply());
-//     // console.log(await token21.balanceOf("0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266"));
-//     await token21.transfer(addr1.address, 50);
-//     await token21.connect(addr1).transfer( addr2.address, 10);
-
-//     expect(await token21.balanceOf(addr1.address)).to.equal(40);
-//     expect(await token21.balanceOf(addr2.address)).to.equal(10);
-
-//     // await token21.setGreeting("Hola, mundo!");
-//     // expect(await token21.greet()).to.equal("Hola, mundo!");
-//   });
-// });
-
-
 describe("ChitFund", function() {
   it("ChitFund functionalities", async function() {
     const ChitFund = await ethers.getContractFactory("ChitFund");
